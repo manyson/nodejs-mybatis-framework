@@ -1,2 +1,16 @@
 # Project exclude paths
 /node_modules/
+/dist/
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+*.code-workspace
+
+# 로그 위치 관련
+/logs/
