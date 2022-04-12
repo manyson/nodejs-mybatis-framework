@@ -6,11 +6,12 @@ const RequestData                       = require('../../common/RequestData');
 // 응답 데이터
 const ResponseData                      = require('../../common/ResponseData');
 
-const Logger = require('../../lib/logger');
+// log
+const Logger                            = require('../../lib/logger');
 
 // 상수 관련 define
 const {DB_FIELD_NAME}                   = require('../../common/Constant');
-const {DATA_FIELD_NAME}                   = require('../../common/Constant');
+const {DATA_FIELD_NAME}                 = require('../../common/Constant');
 const {DB_RESULT}                       = require('../../common/Constant');
 const {NUMERIC}                         = require('../../common/Constant');
 
@@ -21,7 +22,6 @@ const {   RESPONSE_CODE
 
 // 공통 함수
 const Util                              = require('../../lib/util');
-const {v4}                              = require('uuid');
 
 // 모델
 const AuthModel                         = require('../../models/auth/AuthModel');
@@ -43,67 +43,24 @@ const postAuth = async (req, res) => {
     // Authorization 데이터
     let authData = {};
 
-    /**Engine 요청에 대한 인증 처리**/
-    // Engine 에서 온 요청인지 판별 별수
-    let isEngineCall = false;
+    /** 입력 데이터 validation */
+    if ( Util.isEmpty(requestData.getDataValue(DB_FIELD_NAME.ACCOUNT_ID))
+      || Util.isEmpty(requestData.getDataValue(DB_FIELD_NAME.PASSWORD))) {
 
-    if(requestData.isExist("ENGINE")){
-      if(requestData.isExist(DB_FIELD_NAME.ACCOUNT_ID) && requestData.isExist(DB_FIELD_NAME.PASSWORD)) {
-        // ID, password 일치 하는 경우 인증 절차 통과
-        if(requestData.getDataValue(DB_FIELD_NAME.ACCOUNT_ID) === process.env.DATA_ENGINE_ID && requestData.getDataValue(DB_FIELD_NAME.PASSWORD) === process.env.DATA_ENGINE_PWD) {
-          isEngineCall = true;
-
-          authData = {
-            [DATA_FIELD_NAME.ACCESS_TOKEN]    : v4()                                                   ,
-            [DB_FIELD_NAME.ID]                : requestData.getDataValue(DB_FIELD_NAME.ACCOUNT_ID)     ,
-            [DB_FIELD_NAME.ACCOUNT_ID]        : requestData.getDataValue(DB_FIELD_NAME.ACCOUNT_ID)     ,
-            [DB_FIELD_NAME.TRAINING_COMPLETE] : NUMERIC.ONE                                            ,
-            [DB_FIELD_NAME.STATE]             : NUMERIC.ONE                                            ,
-            [DB_FIELD_NAME.FIRST_LOGIN]       : NUMERIC.ZERO                                           ,
-            [DB_FIELD_NAME.AGREEMENT_MUST]    : NUMERIC.ONE
-          }
-        }
-      }
-      else{
-        return responseData.setResponseCode(RESPONSE_CODE.CHECK_AUTH);
-      }
+      // id 또는 password 가 없는 경우
+      return responseData.setResponseCode(RESPONSE_CODE.REQUIRED_FIELD);
     }
-    /**Engine 요청에 대한 인증 처리**/
 
-    if(isEngineCall === false) {
-      // check ID, Password exist
-      if ( Util.isEmpty(requestData.getDataValue(DB_FIELD_NAME.ACCOUNT_ID))
-        || Util.isEmpty(requestData.getDataValue(DB_FIELD_NAME.PASSWORD))) {
+    /**  트랜젝션 여부 셋팅   */
+    await requestData.start(false);
 
-        // id 또는 password 가 없는 경우
-        return responseData.setResponseCode(RESPONSE_CODE.REQUIRED_FIELD);
-      }
+    /**  로그인 정보 조회    */
+    const authInfo              = await AuthModel.selectAuth(requestData);
 
-      /**  트랜젝션 여부 셋팅 */
-      await requestData.start(false);
-
-      // 로그인 처리
-      const authInfo              = await AuthModel.selectAuth(requestData);
-
-      // 인증 정보가 잘 못 되었을 경우
-      if (authInfo == null) {
-        return responseData.setResponseCode(RESPONSE_CODE.CHECK_AUTH);
-      }
-
-      if(authInfo["isPasswordCorrect"] === false){
-        // loginFailCount over
-        let count = authInfo[DB_FIELD_NAME.LOGIN_FAIL_COUNT];
-        if(Number(authInfo[DB_FIELD_NAME.LOGIN_FAIL_COUNT]) >= NUMERIC.ONE &&
-          Number(authInfo[DB_FIELD_NAME.LOGIN_FAIL_COUNT]) <=  NUMERIC.FOUR) {
-          return responseData.setResponseCode(RESPONSE_CODE.PASSWORD_ERROR_MEG, authInfo[DB_FIELD_NAME.LOGIN_FAIL_COUNT]);
-        }
-        return responseData.setResponseCode(RESPONSE_CODE.LOGIN_FAIL_OVER);
-      }
-
-      // Lock 또는 Delete 된 계정인 경우
-      if (authInfo[DB_FIELD_NAME.STATE] !== NUMERIC.ONE) {
-        return responseData.setResponseCode(RESPONSE_CODE.NO_VALID);
-      }
+    /**  사용자 정보가 없는 경우  */
+    if (authInfo == null) {
+      return responseData.setResponseCode(RESPONSE_CODE.CHECK_AUTH);
+    }
 
       // 중복 로그인 여부
       await Redis.getDuplication(requestData);
