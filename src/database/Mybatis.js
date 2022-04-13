@@ -1,9 +1,9 @@
+const path          = require('path');
 const mybatisMapper = require('mybatis-mapper');
 
 // create the myBatisMapper from xml file
 mybatisMapper.createMapper([
-  './database/mapper/auth/auth.xml'               ,
-  './database/mapper/common/common.xml'           ,
+  path.resolve(__dirname, "mapper/user/user.xml"),
 ]);
 
 // get query statement

@@ -4,7 +4,9 @@
  */
 const DB_FIELD_NAME = {
   USER_ID       :     'user_id'   ,
+  USER_NAME     :     'user_name' ,
   PASSWORD      :     'password'  ,
+  SALT          :     'salt'      ,
 };
 
 /**
@@ -18,7 +20,6 @@ const DB_RESULT       = {
   WARNING_STATUS  : 'warningStatus' ,   // warning
   ONE             : 1               ,   // 결과 1건
 };
-
 
 /**
  *  데이터 상태 정보
@@ -34,7 +35,6 @@ const DB_STATE       = {
   NO           : 'N'   ,
 };
 
-
 /**
  *  숫자 상수
  *  @constant {object}
@@ -46,12 +46,16 @@ const NUMERIC          = {
 };
 
 /**
- *  local data에서 사용하는 필드 상수
+ *  local data 에서 사용하는 필드 상수
  *  @constant {object}
  */
 const DATA_FIELD_NAME = {
   AUTHORIZATION       : 'authorization'         ,
   JWT_DECODE          : 'jwtDecode'             ,
+  TOKEN               : 'token'                 ,
+  PAGE                : 'page'                  ,
+  PAGE_SIZE           : 'pageSize'              ,
+  SKIP                : 'pageSkip'              ,
 };
 
 
@@ -60,9 +64,17 @@ const DATA_FIELD_NAME = {
  *  @constant {object}
  */
 const NAMESPACE = {
-  AUTH                :   'AUTH'                ,
+  USER                :   'USER'                ,
 };
 
+/**
+ *  페이징 default value
+ *  @constant {object}
+ */
+const PAGING_DEFAULT = {
+  [DATA_FIELD_NAME.PAGE]      : 1 ,
+  [DATA_FIELD_NAME.PAGE_SIZE] : 10,
+};
 
 /**
  * 시간 형태
@@ -73,12 +85,23 @@ const DATE_FORMAT = {
   YYYY_MM_DD_H_MM_SS  : 'YYYY-MM-DD h:mm:ss',
 }
 
+/**
+ *  HTTP 요청 객체 정보 상수
+ *  @constant {object}
+ */
+const HTTP_REQUEST = {
+  METHOD  : 'METHOD'  ,     /** 요청 메소드    */
+  URL     : 'URL'     ,     /** 요청 URL      */
+};
+
 module.exports = {
-  DB_FIELD_NAME             ,
-  DATA_FIELD_NAME           ,
-  DB_RESULT                 ,
-  NUMERIC                   ,
-  DB_STATE                  ,
-  NAMESPACE                 ,
-  DATE_FORMAT               ,
+  DB_FIELD_NAME      ,
+  DATA_FIELD_NAME    ,
+  DB_RESULT          ,
+  NUMERIC            ,
+  DB_STATE           ,
+  NAMESPACE          ,
+  PAGING_DEFAULT     ,
+  DATE_FORMAT        ,
+  HTTP_REQUEST       ,
 };

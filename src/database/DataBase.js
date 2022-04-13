@@ -1,7 +1,7 @@
-const mariadb   = require('mariadb');
+const mysql   = require('mysql2/promise');
 
 // pool 생성
-let  pool = mariadb.createPool({
+let  pool = mysql.createPool({
     host      : process.env.DB_HOST ,
     port      : process.env.DB_PORT ,
     database  : process.env.DB_NAME ,
@@ -30,9 +30,8 @@ pool.on('connection', () => {
 
 // connection 객체 구하기
 const getPoolConnection = async () => {
-
-  const connect = await pool.getConnection();
-  return connect;
+  const connection = await pool.getConnection(async conn => conn);
+  return connection;
 }
 
 module.exports = getPoolConnection;

@@ -1,6 +1,6 @@
 // module import
-const {SUCCESS_CODE}    = require("./ResponseConst");
-const {RESPONSE_FIELD}  = require('./ResponseConst');
+const {RESPONSE_FIELD}  = require("./ResponseConst");
+const {StatusCodes}     = require("http-status-codes");
 
 // 응답 객체
 class ResponseBase {
@@ -10,7 +10,7 @@ class ResponseBase {
     // secure 설정
     this.secure = false ;
 
-    // property 설정
+    // 응답 실 데이터
     this.data         = data  ;
 
     // 요청 데이터
@@ -25,13 +25,6 @@ class ResponseBase {
     }
   }
 
-  setResponseCode(responseCode, count){
-
-    for (const key in responseCode) {
-      this.data[key] = key === "msg" ? responseCode[key].replace("$n", count).replace("$s", count > 1 ? 's': '') : responseCode[key];
-    }
-  }
-
   // 코드 응답
   getResponseCode(){
     return this.getDataValue(RESPONSE_FIELD.CODE);
@@ -39,7 +32,7 @@ class ResponseBase {
 
   // 정상 응답인지
   isSuccess () {
-    return this.getResponseCode() === SUCCESS_CODE ;
+    return this.getResponseCode() === StatusCodes.OK ;
   }
 
   setData(data){
@@ -50,7 +43,6 @@ class ResponseBase {
 
       for (const key in responseData) {
         // property 에 있는 경우에 셋팅
-        // eslint-disable-next-line no-prototype-builtins
         if(this.data.hasOwnProperty(key) === true){
           if(responseData[key]){
             this.data[key] = responseData[key];
@@ -61,7 +53,6 @@ class ResponseBase {
     else{
       for (const key in data) {
         // property 에 있는 경우에 셋팅
-        // eslint-disable-next-line no-prototype-builtins
         if(this.data.hasOwnProperty(key) === true){
           if(data[key]){
             this.data[key] = data[key];
@@ -73,12 +64,7 @@ class ResponseBase {
 
   // 응답 객체에 특정한 값 셋팅
   setDataValue(key, value){
-
-    // 응답 데이터의 해당 키가 있을 경우 setting
-    // eslint-disable-next-line no-prototype-builtins
-    if(this.data.hasOwnProperty(key) === true){
       this.data[key] = value;
-    }
   }
 
   // 현재 설정된 응답 객체
@@ -92,16 +78,6 @@ class ResponseBase {
     // eslint-disable-next-line no-prototype-builtins
     if(this.data.hasOwnProperty(key) === true) {
       return this.data[key];
-    }
-    return null ;
-  }
-
-  // json string 응답
-  getJsonString(){
-
-    // 데이터가 있는 경우
-    if(this.data){
-      return JSON.stringify(this.data);
     }
     return null ;
   }
@@ -120,7 +96,6 @@ class ResponseBase {
   getRequestData(){
     return this.requestData;
   }
-
 }
 
 module.exports = ResponseBase;

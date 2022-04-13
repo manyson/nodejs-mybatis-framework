@@ -5,7 +5,6 @@ const path = require('path');
 
 // dotenv 통한 환경설정값 추출
 const LOG_DIR = path.join(__dirname, '..', '..', process.env.LOG_DIRECTORY || 'logs');
-const LOG_LVL = process.env.LOG_LEVEL || 'info';
 
 // 기본 로그 형식
 const { combine, timestamp, printf } = winston.format;

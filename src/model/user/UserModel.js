@@ -1,4 +1,4 @@
-// auth.auth.model.js
+// user.user.model.js
 
 const Logger                            = require('../../lib/logger')           ;
 
@@ -24,82 +24,24 @@ const selectAuth = async (requestData) => {
   try {
 
     /**  입력받은 계정, 비밀번호  */
-    const accountID = requestData.getDataValue(DB_FIELD_NAME.ACCOUNT_ID);
-    const password  = requestData.getDataValue(DB_FIELD_NAME.PASSWORD);
+    const userID    = requestData.getDataValue(DB_FIELD_NAME.USER_ID);
 
     // sql parameter setting
     const params = {
-      [DB_FIELD_NAME.USER_ID] :  accountID ,
+      [DB_FIELD_NAME.USER_ID] :  userID ,
     };
 
     // connection 객체
     const connection = requestData.getConnection();
 
     // query
-    const queryString = Query(NAMESPACE.DESIGN,'selectUser', params);
+    const queryString = Query(NAMESPACE.USER,'selectUser', params);
 
     // execute sql
-    const dataSet = await connection.query(queryString);
+    const [dataSet] = await connection.query(queryString);
 
-    // 사용자 조회
-    const statement = Query(NAMESPACE.AUTH, 'selectUser', params);
-
-    const [user] = await requestData.getConnection().query(statement);
-
-    // 사용자 정보가 없으면 에러
-    if (!user) {
-      return null;
-    }
-
-    //loginFailCount over
-    if(Number(user[DB_FIELD_NAME.LOGIN_FAIL_COUNT]) >= NUMERIC.FIVE || user[DB_FIELD_NAME.STATE] === NUMERIC.TWO){
-      user["isPasswordCorrect"] = false;
-      return user;
-    }
-
-    // TODO SALT 존재 여부와 관계 없이 무조건 해시된 값과 비교.
-    //      _현재_ 는 (계정에 SALT 값이 없을 수 있으므로) 조건부 비교
-    const isPasswordCorrect = user[DB_FIELD_NAME.SALT]  // SALT 가 있으면 (비밀번호가 해시값이므로)
-      // 입력받은 비밀번호를 SALT 로 해시한 후 비교
-      ? user[DB_FIELD_NAME.PASSWORD] === await makePasswordHashed(password, user[DB_FIELD_NAME.SALT])
-      // 그렇지 않으면, 그대로 비교
-      : user[DB_FIELD_NAME.PASSWORD] === password;
-
-    //update loginFailCount
-    let loginFailCount;
-    let state;
-    let flag = false;
-    if(isPasswordCorrect == false){
-
-      user[DB_FIELD_NAME.LOGIN_FAIL_COUNT] = loginFailCount = Number(user[DB_FIELD_NAME.LOGIN_FAIL_COUNT] + NUMERIC.ONE);
-      user[DB_FIELD_NAME.STATE] = state = Number(loginFailCount === NUMERIC.FIVE ? NUMERIC.TWO : NUMERIC.ONE);
-      user["isPasswordCorrect"] = false;
-      flag = true;
-
-    }else{
-
-      user["isPasswordCorrect"] = true;
-
-      if(user[DB_FIELD_NAME.LOGIN_FAIL_COUNT] >= NUMERIC.ONE){
-        user[DB_FIELD_NAME.LOGIN_FAIL_COUNT] = loginFailCount = NUMERIC.ZERO;
-        user[DB_FIELD_NAME.STATE] = state = NUMERIC.ONE;
-        flag = true;
-      }
-    }
-
-    if(flag){
-      //update
-      const params = {
-        [DB_FIELD_NAME.ACCOUNT_ID]: accountID,
-        [DB_FIELD_NAME.LOGIN_FAIL_COUNT]: loginFailCount,
-        [DB_FIELD_NAME.STATE]: state
-      };
-
-      const st = Query(NAMESPACE.AUTH, 'updateLoginFailCount', params);
-      const result = await requestData.getConnection().query(st);
-    }
-
-    return user;
+    // 첫번째 레코드
+    return dataSet[DB_RESULT.ROW_FIRST];
   }
   catch (e) {
     Logger.error(e.stack);
@@ -269,35 +211,6 @@ const createHashedPassword = (plainPassword) => {
   });
 };
 
-/**
- * *비밀번호* 해시값
- * param plainPassword {string} 비밀번호
- * param salt {string} salt
- * returns {Promise<string>}
- */
-const makePasswordHashed = (plainPassword, salt) => {
-  return new Promise((resolve, reject) => {
-    crypto.pbkdf2(plainPassword, salt, 9999, 64, 'sha512', (err, key) => {
-      if (err) reject(err);
-      resolve(key.toString('base64'));
-    });
-  });
-};
-
-/**
- * 해시를 위한 Salt 문자열 만들기
- * returns {Promise<string>} Salt
- */
-const createSalt = () => {
-  return new Promise((resolve, reject) => {
-    crypto.randomBytes(64, (err, buf) => {
-      if (err) reject(err);
-      resolve(buf.toString('base64'));
-    });
-  });
-};
-
-
 module.exports = {
   selectAuth                ,
   selectAuthCheck           ,
@@ -305,5 +218,4 @@ module.exports = {
   selectPartnerName         ,
 
   createHashedPassword      ,
-  makePasswordHashed        ,
 };

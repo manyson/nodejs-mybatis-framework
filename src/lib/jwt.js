@@ -5,6 +5,27 @@ const {DATA_FIELD_NAME} = require("../common/Constant");
 const {RESPONSE_CODE} = require("../common/ResponseConst");
 const SECRET_KEY = 'MY-SECRET-KEY';
 
+/**
+ * JWT 토큰 값으로 생성 함수
+ * @description 헤터에 토큰 값을 찾아서 검증 후 응답
+ * @param {Object} payload token 의 payload 에 해당하는 객체
+ * @returns {string} jwt 토큰
+ */
+const getJWTToken = (payload) => {
+
+  /** jwt 토큰 생성 */
+  const token = jwt.sign(
+    {
+      data:payload
+    },
+    process.env.SECRET_KEY,
+    {
+    expiresIn : process.env.EXPIRE_MIN  ,
+    issuer    : process.env.ISSUER     ,
+    });
+
+  return token;
+}
 
 /**
  * JWT 토큰 값으로 decode 된 객체를 구하는 함수
@@ -12,7 +33,7 @@ const SECRET_KEY = 'MY-SECRET-KEY';
  * @param {Object} req HTTP 요청 객체
  * @returns {ResponseData} 응답 데이터
  */
-const getDecodingToken = async (req) => {
+const getPayload = (req) => {
 
   // 요청 데이터
   const requestData   = new RequestData(req.headers);
@@ -27,10 +48,10 @@ const getDecodingToken = async (req) => {
 
     try {
       // 토큰을 키를 사용하여 decode
-      const data = jwt.verify(authorization, SECRET_KEY);
+      const payload = jwt.verify(authorization, SECRET_KEY);
 
       // 정상적으로 decode 된 데이터 설정
-      responseData.setData(data);
+      responseData.setData(payload);
     }
     /** error 구간  */
     catch (error) {
@@ -52,5 +73,6 @@ const getDecodingToken = async (req) => {
 }
 
 module.exports = {
-  getDecodingToken    ,
+  getJWTToken   ,
+  getPayload    ,
 };

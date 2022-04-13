@@ -1,0 +1,62 @@
+openapi: 3.0.0
+info:
+  title: node - mybatis Back-End API
+  description: mybatis를 사용한 node.js 샘플 프로그램
+  license:
+    name: MIT
+  version: 1.0.0
+servers:
+  - url: http://localhost:3100
+    description: Back-End API 서버
+tags:
+  - name: user
+    description: 사용자에 대한 처리
+    externalDocs:
+
+paths:
+  /user/login:
+    post:
+      tags:
+        - user
+      summary: 로그인
+      description: 회원의 정보를 입력 받아서 로그인 처리를 한다.
+      requestBody:
+        description: Pet object that needs to be added to the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        200:    # status code
+          description: JWT 토큰을 반환
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7InVzZX
+        400:
+          description: Bad Request
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+        500:
+          description: Internal Server Error
+          content: { }
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        user_id:
+          type: string
+          example: iu00
+        password:
+          type: string
+          example: q1w2e3!@
+

@@ -1,22 +1,16 @@
 // module import
-const getPoolConnection = require("../database/DataBase");
-const {copyObject}    = require('../lib/util');
-const UserInfo        = require("../common/UserInfo");
+const getPoolConnection     = require("../database/DataBase");
+const {copyObject}          = require('../lib/util');
 
-const Util              = require('../lib/util');
-const {DEFVAL_QUERYSTRING} = require("./Constant");
-const {NUMERIC} = require("./Constant");
-const {DATA_FIELD_NAME} = require("./Constant");
-
-// 상수 관련 define
-const {DB_FIELD_NAME} = require('../common/Constant');
-const DataLog = require("./DataLog");
-const DataLogUnit = require("./DataLogUnit");
+const Util                  = require('../lib/util');
+const {PAGING_DEFAULT}      = require("./Constant");
+const {NUMERIC}             = require("./Constant");
+const {DATA_FIELD_NAME}     = require("./Constant");
 
 // 요청 객체(요청된 값, db connect 정보)
 class RequestData{
 
-  constructor(requestData = {}, userData = {}, viewCode = null){
+  constructor(requestData = {}){
 
     //  connection  정보 초기화
     this.connection  = null  ;
@@ -24,19 +18,8 @@ class RequestData{
     // 입력된 값 설정
     this.setData(requestData);
 
-    // User 정보 설정
-    this.setUser(userData);
-
     // 커넥션을 가지고 있는지
     this.connected  = false ;
-
-    // 로그 정보
-    if(viewCode !== null){
-      this.logData = new DataLog(userData, viewCode);
-    }
-    else{
-      this.logData    = null  ;
-    }
   }
 
   // 데이터 셋팅
@@ -61,38 +44,6 @@ class RequestData{
       return this.data[key];
     }
     return defaultValue ;
-  }
-
-  // 사용자 정보 셋팅
-  setUser = (user) =>{
-    // 입력된 값
-    this.user       = new UserInfo(
-                          user[DB_FIELD_NAME.ID]                ,
-                          user[DB_FIELD_NAME.ACCOUNT_ID]        ,
-                          user[DB_FIELD_NAME.NAME]              ,
-                          user[DB_FIELD_NAME.PARTNER_ID]        ,
-                          user[DB_FIELD_NAME.PARTNER]           ,
-                          user[DB_FIELD_NAME.ROLE]              ,
-                          user[DB_FIELD_NAME.TIME_ZONE]         ,
-                          user[DB_FIELD_NAME.LANGUAGE]          ,
-                          user[DB_FIELD_NAME.PASSWORD_EXPIRE]   ,
-                          user[DB_FIELD_NAME.TRAINING_COMPLETE] ,
-                          user[DB_FIELD_NAME.STATE]             ,
-                          user[DB_FIELD_NAME.FIRST_LOGIN]       ,
-                          user[DB_FIELD_NAME.AGREEMENT_MUST]
-                      );
-  }
-
-  getUser = () =>{
-    return this.user ;
-  }
-
-  // 주어진 키로 user data 구하기
-  getUserValue = (key) => {
-    if (this.user.hasOwnProperty(key)) {
-      return this.user[key];
-    }
-    return null;
   }
 
   // 키에 해당 하는 값이 존재하는 지 체크
@@ -128,8 +79,8 @@ class RequestData{
     const DFN_SIZE = DATA_FIELD_NAME.PAGE_SIZE;
     const DFN_SKIP = DATA_FIELD_NAME.SKIP;
 
-    const page      = Number(this.getDataValue(DFN_PAGE) || DEFVAL_QUERYSTRING[DFN_PAGE]);
-    const pageSize  = Number(this.getDataValue(DFN_SIZE) || DEFVAL_QUERYSTRING[DFN_SIZE]);
+    const page      = Number(this.getDataValue(DFN_PAGE) || PAGING_DEFAULT[DFN_PAGE]);
+    const pageSize  = Number(this.getDataValue(DFN_SIZE) || PAGING_DEFAULT[DFN_SIZE]);
     const pageSkip  = pageSize * (page > NUMERIC.ONE ? page - NUMERIC.ONE : NUMERIC.ZERO);
 
     // Model에서 사용할 Pagination 관련 값 설정
