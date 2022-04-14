@@ -36,4 +36,10 @@
         WHERE user_id = #{user_id}
     </update>
 
+    <!-- 사용자 삭제 -->
+    <delete id="deleteUser">
+        DELETE FROM TB_USER
+        WHERE user_id = #{user_id}
+    </delete>
+
 </mapper>

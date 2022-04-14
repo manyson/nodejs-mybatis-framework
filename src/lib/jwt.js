@@ -52,10 +52,10 @@ const getPayload = (req) => {
   const responseData  = new ResponseData();
 
   /**  header에서  authorization 데이터 존재 여부 체크  */
-  if (requestData.isExist(DATA_FIELD_NAME.AUTHORIZATION)) {
+  if ( req.headers.hasOwnProperty(DATA_FIELD_NAME.AUTHORIZATION)){
 
     // 토큰 (req.headers.authorization)
-    let authorization = requestData.getDataValue(DATA_FIELD_NAME.AUTHORIZATION);
+    let authorization = req.headers[DATA_FIELD_NAME.AUTHORIZATION];
 
     // Bearer 명시 되어 있으면
     const pos = authorization.indexOf(DATA_FIELD_NAME.BEARER);

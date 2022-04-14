@@ -6,6 +6,7 @@ const Util                  = require('../lib/util');
 const {PAGING_DEFAULT}      = require("./Constant");
 const {NUMERIC}             = require("./Constant");
 const {DATA_FIELD_NAME}     = require("./Constant");
+const PayloadData           = require("./PayloadData");
 
 /**
  *  @summary
@@ -22,48 +23,72 @@ class RequestData{
     //  connection  정보 초기화
     this.connection  = null  ;
 
-    // 입력된 값 설정
-    this.setData(requestData);
+    // payload
+    this.payload     = new PayloadData();
+
+    // header
+    this.header       = null;
+
+    // body
+    this.body         = null ;
 
     // 커넥션을 가지고 있는지
-    this.connected  = false ;
+    this.connected    = false ;
+
+    // 입력된 값 설정
+    this.initData(requestData);
   }
 
   /**
    * object 형을 입력 받아서 data 필드 전체 설정
    * @param {object} 입력 data
    */
-  setData = (data) =>{
-    // 입력된 값
-    this.data       = copyObject(data);
+  initData = (data) =>{
+
+    // payload 값이 있는 경우
+    if(data.hasOwnProperty(DATA_FIELD_NAME.PAYLOAD)){
+      this.payload.loadObject(data[DATA_FIELD_NAME.PAYLOAD]);
+    }
+
+    if(data.hasOwnProperty(DATA_FIELD_NAME.BODY)){
+      this.body = copyObject(data[DATA_FIELD_NAME.BODY]);
+    }
   }
 
   /**
-   * data object 전체 조회
-   * @returns {object} data 오브젝트
+   * 유저 아이디 조회
+   * @returns {object} body 오브젝트
    */
-  getData = () =>{
-    return this.data ;
+  getUserID = () =>{
+    return this.payload.getUserID();
   }
 
   /**
-   * 키와 값을 입력 받아서 data 필드에 설정
+   * body object 전체 조회
+   * @returns {object} body 오브젝트
+   */
+  getBody = () =>{
+    return this.body ;
+  }
+
+  /**
+   * 키와 값을 입력 받아서 body 필드에 설정
    * @param {string} 입력 키
    * @param {any}    입력 값
    */
-  setDataValue = (key, value)=> {
-    this.data[key] = copyObject(value);
+  setBodyValue = (key, value)=> {
+    this.body[key] = copyObject(value);
   }
 
   /**
-   * 주어진 key로 데이터 구하기
+   * 주어진 key로  body 값 구하기
    * @param {string} 입력 키
    * @param {string} 키에 해당하는 값이 없을 때 기본 값
    * @returns {any} 키에 해당하는 값
    */
-  getDataValue = (key, defaultValue = null) =>{
-    if(this.data.hasOwnProperty(key)){
-      return this.data[key];
+  getBodyValue = (key, defaultValue = null) =>{
+    if(this.body.hasOwnProperty(key)){
+      return this.body[key];
     }
     return defaultValue ;
   }
@@ -73,8 +98,8 @@ class RequestData{
    * @param {string} 입력 키
    * @returns {boolean} data 필드에 해당 키의 존재 여부
    */
-  isExist = (key) => {
-    return this.data.hasOwnProperty(key);
+  isBodyExist = (key) => {
+    return this.body.hasOwnProperty(key);
   }
 
   /**
@@ -86,7 +111,7 @@ class RequestData{
     let result = true;
     fieldList.forEach(fieldName => {
       if (result)
-        result = result && (Util.findProp(this.getData(), fieldName) != null);
+        result = result && (Util.findProp(this.getBody(), fieldName) != null);
     });
     return result;
   }
@@ -104,14 +129,14 @@ class RequestData{
     const DFN_SIZE = DATA_FIELD_NAME.PAGE_SIZE;
     const DFN_SKIP = DATA_FIELD_NAME.SKIP;
 
-    const page      = Number(this.getDataValue(DFN_PAGE) || PAGING_DEFAULT[DFN_PAGE]);
-    const pageSize  = Number(this.getDataValue(DFN_SIZE) || PAGING_DEFAULT[DFN_SIZE]);
+    const page      = Number(this.getBodyValue(DFN_PAGE) || PAGING_DEFAULT[DFN_PAGE]);
+    const pageSize  = Number(this.getBodyValue(DFN_SIZE) || PAGING_DEFAULT[DFN_SIZE]);
     const pageSkip  = pageSize * (page > NUMERIC.ONE ? page - NUMERIC.ONE : NUMERIC.ZERO);
 
     // Model에서 사용할 Pagination 관련 값 설정
-    this.setDataValue(DFN_SIZE, pageSize);
-    this.setDataValue(DFN_SKIP, pageSkip);
-    this.setDataValue(DFN_PAGE, page);
+    this.setBodyValue(DFN_SIZE, pageSize);
+    this.setBodyValue(DFN_SKIP, pageSkip);
+    this.setBodyValue(DFN_PAGE, page);
 
     return page;
   };

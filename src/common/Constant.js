@@ -60,6 +60,7 @@ const DATA_FIELD_NAME = {
 
   PAYLOAD             : 'payload'               ,
   DATA                : 'data'                  ,
+  BODY                : 'body'                  ,
 };
 
 

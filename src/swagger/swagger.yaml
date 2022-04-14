@@ -127,8 +127,32 @@ paths:
                   message:
                     type: string
                     example: Success
-        409:
-          description: Conflict
+        401:
+          description: Unauthorized
+          content: { }
+        500:
+          description: Internal Server Error
+          content: { }
+    delete:
+      tags:
+        - user
+      summary: 사용자 정보 삭제
+      description: 사용자 정보를 삭제한다.
+      security:
+        - jwt: [ ]
+      responses:
+        200: # status code
+          description: 성공 메시지
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Success
+        401:
+          description: Unauthorized
           content: { }
         500:
           description: Internal Server Error
@@ -141,10 +165,10 @@ components:
       properties:
         user_id:
           type: string
-          example: iu00
+          example: USER_1ST
         password:
           type: string
-          example: dlzmfksakrxh
+          example: Rnfehowl
         user_name:
           type: string
           example: 하우머치
@@ -153,10 +177,10 @@ components:
       properties:
         user_id:
           type: string
-          example: iu00
+          example: USER_1ST
         password:
           type: string
-          example: PASSWORD
+          example: Rnfehowl
     UserInfo:
       type: object
       properties:
@@ -165,7 +189,7 @@ components:
           properties:
             user_id:
               type: string
-              example: iu00
+              example: USER_1ST
             user_name:
               type: string
               example: 투머치
@@ -174,10 +198,10 @@ components:
       properties:
         password:
           type: string
-          example: 패스워드
+          example: Ehdehowl
         user_name:
           type: string
-          example: 투머치
+          example: 나이스가이
 
   securitySchemes:
     jwt:

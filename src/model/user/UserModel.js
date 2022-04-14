@@ -17,13 +17,21 @@ const { NAMESPACE, DB_RESULT, DB_FIELD_NAME } = require('../../common/Constant')
  * 사용자 조회
  * description 사용자 ID로 사용자 조회
  * param {RequestData} requestData 요청 데이터
+ * param {String} 사용자 아이디
  * returns {Object|undefined} 사용자 정보 객체
  */
-const selectUser = async (requestData) => {
+const selectUser = async (requestData, ID = null) => {
   try {
 
-    /**  입력받은 아이디       */
-    const userID    = requestData.getDataValue(DB_FIELD_NAME.USER_ID);
+    let userID    = null ;
+
+    /**  입력받은 아이디로 사용한다면 받은 아이디로 사용하고 */
+    if(ID !== null){
+      userID = ID;
+    }
+    else{
+      userID = requestData.getUserID();
+    }
 
     /**  sql parameter 설정  */
     const params = {
@@ -49,19 +57,19 @@ const selectUser = async (requestData) => {
 };
 
 /**
- * 사용자 입력
- * description 사용자 정보로 회원 가입 처리
- * param {RequestData} requestData 요청 데이터
- * returns {boolean} 성공 여부
+ *  사용자 입력
+ * @description 사용자 정보로 회원 가입 처리
+ * @param {RequestData} requestData 요청 데이터
+ * @returns {boolean} 성공 여부
  */
 const insertUser = async (requestData) => {
 
   try {
     /**  입력받은 정보    */
-    const userID    = requestData.getDataValue(DB_FIELD_NAME.USER_ID);
-    const password  = requestData.getDataValue(DB_FIELD_NAME.PASSWORD);
-    const userName  = requestData.getDataValue(DB_FIELD_NAME.USER_NAME);
-    const salt      = requestData.getDataValue(DB_FIELD_NAME.SALT);
+    const userID    = requestData.getBodyValue(DB_FIELD_NAME.USER_ID);
+    const password  = requestData.getBodyValue(DB_FIELD_NAME.PASSWORD);
+    const userName  = requestData.getBodyValue(DB_FIELD_NAME.USER_NAME);
+    const salt      = requestData.getBodyValue(DB_FIELD_NAME.SALT);
 
     /** SQL parameter   */
     const params = {
@@ -78,12 +86,7 @@ const insertUser = async (requestData) => {
     const statement = Query(NAMESPACE.USER,'insertUser', params);
     const res = await connection.query(statement);
 
-    if (res[DB_RESULT.ROW_FIRST][DB_RESULT.AFFECTED_ROWS] === DB_RESULT.ONE) {
-      return true;
-    }
-    else{
-      return false;
-    }
+    return res[DB_RESULT.ROW_FIRST][DB_RESULT.AFFECTED_ROWS] === DB_RESULT.ONE;
   }
   catch (e) {
     Logger.error(e.stack);
@@ -102,6 +105,9 @@ const updateUser = async (requestData, params) => {
 
   try {
 
+    const userID = requestData.getUserID();
+    params[DB_FIELD_NAME.USER_ID]= userID;
+
     /**  connection 객체  */
     const connection = requestData.getConnection();
 
@@ -109,12 +115,40 @@ const updateUser = async (requestData, params) => {
     const statement = Query(NAMESPACE.USER,'updateUser', params);
     const res = await connection.query(statement);
 
-    if (res[DB_RESULT.ROW_FIRST][DB_RESULT.AFFECTED_ROWS] === DB_RESULT.ONE) {
-      return true;
-    }
-    else{
-      return false;
-    }
+    return res[DB_RESULT.ROW_FIRST][DB_RESULT.AFFECTED_ROWS] === DB_RESULT.ONE;
+  }
+  catch (e) {
+    Logger.error(e.stack);
+    throw e;
+  }
+};
+
+/**
+ *  사용자 데이터 삭제
+ *  @param {RequestData} requestData  -  요청 데이터
+ *  @param  {Object} params           -  삭제 정보가 있는 객체
+ *  @return {boolean}                 -  삭제 정상 처리 여부
+ */
+const deleteUser = async (requestData) => {
+
+  try {
+
+    /**  입력받은 정보    */
+    const userID    = requestData.getUserID();
+
+    /**  connection 객체  */
+    const connection = requestData.getConnection();
+
+    /** SQL parameter   */
+    const params = {
+      [DB_FIELD_NAME.USER_ID]   : userID,
+    };
+
+    /**  query 문장       */
+    const statement = Query(NAMESPACE.USER,'deleteUser', params);
+    const res = await connection.query(statement);
+
+    return res[DB_RESULT.ROW_FIRST][DB_RESULT.AFFECTED_ROWS] === DB_RESULT.ONE;
   }
   catch (e) {
     Logger.error(e.stack);
@@ -126,4 +160,5 @@ module.exports = {
   selectUser    ,
   insertUser    ,
   updateUser    ,
+  deleteUser    ,
 };
