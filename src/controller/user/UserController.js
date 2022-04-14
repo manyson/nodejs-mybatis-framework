@@ -18,7 +18,7 @@ const RequestData                       = require('../../common/RequestData');
 const ResponseData                      = require('../../common/ResponseData');
 
 // 상수
-const {DB_FIELD_NAME, DATA_FIELD_NAME}  = require('../../common/Constant');
+const {DB_FIELD_NAME}                   = require('../../common/Constant');
 const { RESPONSE_CODE, RESPONSE_FIELD } = require('../../common/ResponseConst');
 
 // 모델
