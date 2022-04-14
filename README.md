@@ -43,7 +43,6 @@ $ docker pull redis
 docker network create redis-net
 
 
-
 설정 파일 다운로드, 정보 수정
 
 http://download.redis.io/redis-stable/redis.conf
