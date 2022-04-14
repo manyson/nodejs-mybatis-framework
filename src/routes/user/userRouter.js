@@ -4,7 +4,16 @@ const router      = express.Router();
 // controller
 const controller  = require('../../controller/user/UserController');
 
-// user 요청에 대한 처리
+/** 회원 가입 */
+router.post('/signUp'        , controller.signUp);
+
+/** 로그인  */
 router.post('/login'        , controller.login);
+
+/** 사용자 정보 조회 */
+router.get('/info'          , controller.info);
+
+/** 사용자 정보 수정 */
+router.put('/info'          , controller.change);
 
 module.exports = router;

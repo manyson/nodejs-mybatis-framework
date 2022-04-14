@@ -51,11 +51,15 @@ const NUMERIC          = {
  */
 const DATA_FIELD_NAME = {
   AUTHORIZATION       : 'authorization'         ,
+  BEARER              : 'Bearer '               ,
   JWT_DECODE          : 'jwtDecode'             ,
   TOKEN               : 'token'                 ,
   PAGE                : 'page'                  ,
   PAGE_SIZE           : 'pageSize'              ,
   SKIP                : 'pageSkip'              ,
+
+  PAYLOAD             : 'payload'               ,
+  DATA                : 'data'                  ,
 };
 
 

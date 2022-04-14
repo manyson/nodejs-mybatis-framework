@@ -2,10 +2,38 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="USER">
 
+    <!-- 사용자 조회 -->
     <select id="selectUser">
         SELECT *
         FROM TB_USER
         WHERE user_id = #{user_id}
     </select>
+
+    <!-- 사용자 생성 -->
+    <insert id="insertUser">
+        INSERT INTO TB_USER
+        ( user_id
+        , user_name
+        , password
+        , salt
+        )
+        VALUES
+        ( #{user_id}
+        , #{user_name}
+        , #{password}
+        , #{salt}
+        )
+    </insert>
+
+    <!-- 사용자 변경 -->
+    <update id="updateUser">
+        UPDATE TB_USER
+        <set>
+            <if test="user_name != null"> user_name=#{user_name},</if>
+            <if test="password != null"> password=#{password},</if>
+            <if test="text != null"> text=#{text},</if>
+        </set>
+        WHERE user_id = #{user_id}
+    </update>
 
 </mapper>

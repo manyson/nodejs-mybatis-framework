@@ -3,18 +3,37 @@ const winstonDaily  = require('winston-daily-rotate-file');
 
 const path = require('path');
 
-// dotenv 통한 환경설정값 추출
+/**
+ * namespace lib
+ * property {module:lib/logger} logger - log library
+ */
+
+/**
+ *  log library
+ *  module       lib/logger
+ *  author       김정현
+ *  version      1.0, 작업 내용
+ */
+
+/**
+ * dotenv 통한 환경설정값 추출
+ */
 const LOG_DIR = path.join(__dirname, '..', '..', process.env.LOG_DIRECTORY || 'logs');
 
-// 기본 로그 형식
+/**
+ * 기본 로그 형식
+ */
 const { combine, timestamp, printf } = winston.format;
 
-// Define log format
+/**
+ * Define log format
+ */
 const logFormat = printf(info => {
   return `${info.timestamp} ${info.level}: ${info.message}`;
 });
 
-/*
+/**
+ * Logger 객체 생성
  * Log Level
  * error: 0, warn: 1, info: 2, http: 3, verbose: 4, debug: 5, silly: 6
  */
@@ -39,7 +58,7 @@ const logger = winston.createLogger({
     new winstonDaily({
       level: 'error',
       datePattern: 'YYYY-MM-DD',
-      dirname: LOG_DIR + '/error',  // error.log 파일은 /logs/error 하위에 저장
+      dirname: LOG_DIR,
       filename: `%DATE%.error.log`,
       maxFiles: 30,
       zippedArchive: true,

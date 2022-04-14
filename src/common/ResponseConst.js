@@ -1,6 +1,9 @@
 const {StatusCodes} = require('http-status-codes');
 
-// 응답 데이터 field 정의
+/**
+ *  응답 데이터 field 정의
+ *  @constant {object}
+ */
 const RESPONSE_FIELD = {
   CODE  : 'code'      ,     // 응답 코드
   MSG   : 'message'   ,     // 응답 메시지
@@ -12,10 +15,14 @@ const RESPONSE_FIELD = {
 };
 
 
-// 응답 코드 테이블
+/**
+ *  응답 코드 테이블
+ *  @constant {object}
+ */
 const RESPONSE_CODE = {
+
   // 정상 응답 값
-  SUCCESS             : { [RESPONSE_FIELD.CODE] : StatusCodes.OK  },
+  SUCCESS             : { [RESPONSE_FIELD.CODE] : StatusCodes.OK , [RESPONSE_FIELD.MSG] : 'Success' },
   CONTACT_ADMIN       : { [RESPONSE_FIELD.CODE] : StatusCodes.INTERNAL_SERVER_ERROR , [RESPONSE_FIELD.MSG] : 'Please contact the administrator' },
 
   // validation
@@ -31,11 +38,14 @@ const RESPONSE_CODE = {
   WRONG_ACCOUNT     : { [RESPONSE_FIELD.CODE] : StatusCodes.UNAUTHORIZED  , [RESPONSE_FIELD.MSG] : 'The account is incorrect' },
   WRONG_PASSWORD    : { [RESPONSE_FIELD.CODE] : StatusCodes.UNAUTHORIZED  , [RESPONSE_FIELD.MSG] : 'The current password is incorrect' },
 
+  // 아이디 중복
+  ID_DUPLICATE      : { [RESPONSE_FIELD.CODE] : StatusCodes.CONFLICT      , [RESPONSE_FIELD.MSG] : 'The user ID is duplicated' },
+
   // Custom 에러
   NO_DATA           : { [RESPONSE_FIELD.CODE] : StatusCodes.NO_CONTENT     , [RESPONSE_FIELD.MSG] : 'No data' },
 
   // DB 에러
-  DB_ERROR          : { [RESPONSE_FIELD.CODE] : StatusCodes.INTERNAL_SERVER_ERROR , [RESPONSE_FIELD.MSG] : 'DB Error' },
+  DB_ERROR          : { [RESPONSE_FIELD.CODE] : StatusCodes.INTERNAL_SERVER_ERROR , [RESPONSE_FIELD.MSG] : 'Database processing Error' },
 };
 
 

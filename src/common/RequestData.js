@@ -1,13 +1,20 @@
-// module import
 const getPoolConnection     = require("../database/DataBase");
-const {copyObject}          = require('../lib/util');
 
+const {copyObject}          = require('../lib/util');
 const Util                  = require('../lib/util');
+
 const {PAGING_DEFAULT}      = require("./Constant");
 const {NUMERIC}             = require("./Constant");
 const {DATA_FIELD_NAME}     = require("./Constant");
 
-// 요청 객체(요청된 값, db connect 정보)
+/**
+ *  @summary
+ *  요청 객체(요청된 값, db connect 정보)를 다루는 class
+ *
+ *  @author 김정현 <artjung77@gmail.com>
+ *  @version 1.0,
+ *  @see None
+ */
 class RequestData{
 
   constructor(requestData = {}){
@@ -22,23 +29,38 @@ class RequestData{
     this.connected  = false ;
   }
 
-  // 데이터 셋팅
+  /**
+   * object 형을 입력 받아서 data 필드 전체 설정
+   * @param {object} 입력 data
+   */
   setData = (data) =>{
     // 입력된 값
     this.data       = copyObject(data);
   }
 
-  // 전체 데이터 get
+  /**
+   * data object 전체 조회
+   * @returns {object} data 오브젝트
+   */
   getData = () =>{
     return this.data ;
   }
 
-  // key 로 데이터 세팅
+  /**
+   * 키와 값을 입력 받아서 data 필드에 설정
+   * @param {string} 입력 키
+   * @param {any}    입력 값
+   */
   setDataValue = (key, value)=> {
     this.data[key] = copyObject(value);
   }
 
-  // 주어진 key로 데이터 구하기
+  /**
+   * 주어진 key로 데이터 구하기
+   * @param {string} 입력 키
+   * @param {string} 키에 해당하는 값이 없을 때 기본 값
+   * @returns {any} 키에 해당하는 값
+   */
   getDataValue = (key, defaultValue = null) =>{
     if(this.data.hasOwnProperty(key)){
       return this.data[key];
@@ -46,7 +68,11 @@ class RequestData{
     return defaultValue ;
   }
 
-  // 키에 해당 하는 값이 존재하는 지 체크
+  /**
+   * data 필드에 해당 키가 존재하는지를 체크
+   * @param {string} 입력 키
+   * @returns {boolean} data 필드에 해당 키의 존재 여부
+   */
   isExist = (key) => {
     return this.data.hasOwnProperty(key);
   }
@@ -65,7 +91,6 @@ class RequestData{
     return result;
   }
 
-  // paging 처리
   /**
    * Pagination
    * @returns {number} 현재 페이지 번호
@@ -91,34 +116,26 @@ class RequestData{
     return page;
   };
 
-  // connection 객체 응답
+  /**
+   * connection 객체 응답
+   * @returns {object} database connection object
+   */
   getConnection = () =>{
     return this.connection;
   }
 
-  // connect 여부
+  /**
+   * connect 여부
+   * @returns {boolean}  database connected 여부
+   */
   isConnected = () => {
     return this.connected ;
   };
 
-  // 로그 데이터가 있는 경우
-  isLogData = () => {
-    return this.logData !== null;
-  };
-
-  // 로그 데이터 추가
-  addLogData = (tableName, actionCode, fields) => {
-    const logDataUnit = new DataLogUnit(tableName, actionCode, fields);
-    this.logData.addDataLog(logDataUnit);
-  };
-
-  // 로그 데이터 구하기
-  getLogString = () => {
-    return this.logData.toString();
-  };
-
-
-  // 시작 시 처리
+  /**
+   * 트랜젝션 시작시 처리 사항
+   * @param {boolean} transaction 사용 여부
+   */
   start = async (transaction = false) =>{
 
     //  트랜잭션 여부
@@ -132,7 +149,10 @@ class RequestData{
     }
   }
 
-  // 종료시 처리
+  /**
+   * 트랜젝션 종료시 처리
+   * @param {boolean} transaction 정상 완료 여부
+   */
   end = async (complete = true) =>{
 
     if(this.isConnected() === true) {
@@ -148,36 +168,43 @@ class RequestData{
     }
   }
 
-  // error 처리
+  /**
+   * transaction error 시 처리 사항
+   */
   error = async () =>{
     if(this.transaction === true){
       await this.rollback();
     }
-
-    if(this.logData !== null){
-      this.logData = null ;
-    }
   }
 
-  // 트랙잭션
+  /**
+   * begin transaction
+   */
   beginTransaction = async () =>{
     await this.connection.beginTransaction();
   }
 
-  // commit
+  /**
+   * commit transaction
+   */
   commit = async () => {
     console.log(`commit ^^^^^`);
     await this.connection.commit();
     await this.release();
   }
 
-  // rollback
+  /**
+   * rollback transaction
+   */
   rollback = async () => {
     console.log(`rollback ㅠㅠㅠㅠㅠ`);
     await this.connection.rollback();
     await this.release();
   }
 
+  /**
+   * connection release
+   */
   release = async () =>{
     await this.connection.release();
     this.connected = false ;

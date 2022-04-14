@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: node - mybatis Back-End API
-  description: mybatis를 사용한 node.js 샘플 프로그램
+  description: mybatis를 사용한 node.js framework
   license:
     name: MIT
   version: 1.0.0
@@ -14,6 +14,37 @@ tags:
     externalDocs:
 
 paths:
+  /user/signUp:
+    post:
+      tags:
+        - user
+      summary: 회원 가입
+      description: 회원의 정보를 입력 받아서 회원 가입을 한다.
+      requestBody:
+        description: 회원 정보 입력
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUp'
+        required: true
+      responses:
+        200: # status code
+          description: 성공 메시지
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Success
+        409:
+          description: Conflict
+          content: {}
+        500:
+          description: Internal Server Error
+          content: {}
+
   /user/login:
     post:
       tags:
@@ -21,11 +52,11 @@ paths:
       summary: 로그인
       description: 회원의 정보를 입력 받아서 로그인 처리를 한다.
       requestBody:
-        description: Pet object that needs to be added to the store
+        description: 회원 정보 입력
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/Login'
         required: true
       responses:
         200:    # status code
@@ -46,11 +77,66 @@ paths:
           content: {}
         500:
           description: Internal Server Error
+          content: {}
+  /user/info:
+    get:
+      tags:
+        - user
+      summary: 사용자 정보 조회
+      description: 사용자 정보를 조회한다.
+      security:
+        - jwt: []
+      responses:
+        200: # status code
+          description: 사용자 정보 조회 object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
+        400:
+          description: Bad Request
+          content: {}
+        401:
+          description: Unauthorized
+          content: {}
+        500:
+          description: Internal Server Error
+          content: {}
+    put:
+      tags:
+        - user
+      summary: 사용자 정보 수정
+      description: 사용자 정보를 수정한다.
+      requestBody:
+        description: 수정할 정보 입력
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+        required: true
+      security:
+        - jwt: [ ]
+      responses:
+        200: # status code
+          description: 성공 메시지
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Success
+        409:
+          description: Conflict
+          content: { }
+        500:
+          description: Internal Server Error
           content: { }
 
 components:
   schemas:
-    User:
+    SignUp:
       type: object
       properties:
         user_id:
@@ -58,5 +144,45 @@ components:
           example: iu00
         password:
           type: string
-          example: q1w2e3!@
+          example: dlzmfksakrxh
+        user_name:
+          type: string
+          example: 하우머치
+    Login:
+      type: object
+      properties:
+        user_id:
+          type: string
+          example: iu00
+        password:
+          type: string
+          example: PASSWORD
+    UserInfo:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            user_id:
+              type: string
+              example: iu00
+            user_name:
+              type: string
+              example: 투머치
+    UserUpdate:
+      type: object
+      properties:
+        password:
+          type: string
+          example: 패스워드
+        user_name:
+          type: string
+          example: 투머치
+
+  securitySchemes:
+    jwt:
+      type: http
+      name: jwt
+      scheme: bearer
+      in: header
 

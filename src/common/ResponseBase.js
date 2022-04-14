@@ -2,7 +2,14 @@
 const {RESPONSE_FIELD}  = require("./ResponseConst");
 const {StatusCodes}     = require("http-status-codes");
 
-// 응답 객체
+/**
+ *  @summary
+ *  기본 응답 객체
+ *
+ *  @author 김정현 <artjung77@gmail.com>
+ *  @version 1.0,
+ *  @see None
+ */
 class ResponseBase {
 
   constructor(data, requestData){
@@ -17,62 +24,62 @@ class ResponseBase {
     this.requestData  = requestData ;
   }
 
-  // 코드 데이터 설정
+  /**
+   * 응답 코드 객체의 내용을 설정
+   * @param {object} 응답 코드 객체
+   */
   setResponseCode(responseCode){
-
     for (const key in responseCode) {
       this.data[key] = responseCode[key];
     }
   }
 
-  // 코드 응답
+  /**
+   * 응답객체의 응답 코드를 조회
+   * @returns {number} 응답 코드
+   */
   getResponseCode(){
     return this.getDataValue(RESPONSE_FIELD.CODE);
   }
 
-  // 정상 응답인지
+  /**
+   * 정상 응답인지 체크
+   * @returns {boolean} 정상 처리 응답 여부
+   */
   isSuccess () {
     return this.getResponseCode() === StatusCodes.OK ;
   }
 
+  /**
+   * 응답 데이터 설정
+   * @param {object} 응답 데이터에 사용할 객체
+   */
   setData(data){
-
-    if(data instanceof ResponseBase){
-
-      const responseData = data.getData();
-
-      for (const key in responseData) {
-        // property 에 있는 경우에 셋팅
-        if(this.data.hasOwnProperty(key) === true){
-          if(responseData[key]){
-            this.data[key] = responseData[key];
-          }
-        }
-      }
-    }
-    else{
-      for (const key in data) {
-        // property 에 있는 경우에 셋팅
-        if(this.data.hasOwnProperty(key) === true){
-          if(data[key]){
-            this.data[key] = data[key];
-          }
-        }
-      }
-    }
+    this.data = data;
   }
 
-  // 응답 객체에 특정한 값 셋팅
+  /**
+   * 응답 데이터에 특정한 값 셋팅
+   * @param {string} 응답 데이터 설정할 키
+   * @param {any}    응답 데이터 설정할 값
+   */
   setDataValue(key, value){
       this.data[key] = value;
   }
 
-  // 현재 설정된 응답 객체
+  /**
+   * 응답 데이터 객체 조회
+   * @returns {object} 응답 데이터
+   */
   getData(){
     return this.data;
   }
 
-  // 응답 객체에서 특정 값 응답
+  /**
+   * 응답 데이터에 특정 값 조회
+   * @param {string} 응답 데이터 설정할 키
+   * @returns {any} 키에 해당하는 값
+   */
   getDataValue(key){
 
     // eslint-disable-next-line no-prototype-builtins
@@ -87,12 +94,18 @@ class ResponseBase {
     this.secure = true ;
   }
 
-  // 암호 여부 체크
+  /**
+   * 암호화 여부 조회
+   * @returns {boolean} 암호화 여부
+   */
   getSecure(){
     return this.secure;
   }
 
-  // 요청 데이터
+  /**
+   * 요청 데이터 조회
+   * @returns {object} 요청 데이터
+   */
   getRequestData(){
     return this.requestData;
   }

@@ -3,7 +3,18 @@ const RequestData = require("../common/RequestData");
 const ResponseData = require("../common/ResponseData");
 const {DATA_FIELD_NAME} = require("../common/Constant");
 const {RESPONSE_CODE} = require("../common/ResponseConst");
-const SECRET_KEY = 'MY-SECRET-KEY';
+
+/**
+ * namespace lib
+ * property {module:lib/jwt} jwt - jwt library
+ */
+
+/**
+ *  jwt library
+ *  module       lib/jwt
+ *  author       김정현
+ *  version      1.0, 작업 내용
+ */
 
 /**
  * JWT 토큰 값으로 생성 함수
@@ -44,23 +55,31 @@ const getPayload = (req) => {
   if (requestData.isExist(DATA_FIELD_NAME.AUTHORIZATION)) {
 
     // 토큰 (req.headers.authorization)
-    const authorization = requestData.getDataValue(DATA_FIELD_NAME.AUTHORIZATION);
+    let authorization = requestData.getDataValue(DATA_FIELD_NAME.AUTHORIZATION);
+
+    // Bearer 명시 되어 있으면
+    const pos = authorization.indexOf(DATA_FIELD_NAME.BEARER);
+    if(pos === 0){
+      authorization = authorization.substring(DATA_FIELD_NAME.BEARER.length, authorization.length);
+    }
 
     try {
       // 토큰을 키를 사용하여 decode
-      const payload = jwt.verify(authorization, SECRET_KEY);
+      const payload = jwt.verify(authorization, process.env.SECRET_KEY);
 
       // 정상적으로 decode 된 데이터 설정
-      responseData.setData(payload);
+      responseData.setDataValue(DATA_FIELD_NAME.PAYLOAD, payload[DATA_FIELD_NAME.DATA]);
     }
     /** error 구간  */
     catch (error) {
       // token expired
       if (error.message === 'jwt expired') {
         responseData.setResponseCode(RESPONSE_CODE.TOKEN_EXPIRED);
-      } else if (error.name === 'invalid token') {
+      }
+      else if (error.name === 'invalid token') {
         responseData.setResponseCode(RESPONSE_CODE.INVALID_TOKEN)
-      } else {
+      }
+      else {
         responseData.setResponseCode(RESPONSE_CODE.VERIFY_TOKEN_FAIL);
       }
     }
