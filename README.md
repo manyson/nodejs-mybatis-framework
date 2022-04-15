@@ -1,13 +1,14 @@
 # nodejs-mybatis-framework
+
+## :books: nodejs-mybatis-framework
+mybatis mapper 를 사용하는 Node.js 프로그램을 작성할 때 효율적으로 개발 할 수 있도록 공통 기능이 제공되는 framework 제작을 목적으로 합니다.
+
 ## Index
 - [Overview](#overview)
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
 - [Authors](#authors)
 - [License](#license)
-
-## :books: nodejs-mybatis-framework
-mybatis mapper 를 사용하는 Node.js 프로그램을 작성할 때 효율적으로 개발 할 수 있도록 공통 기능이 제공되는 framework 제작을 목적으로 합니다.
 
 ## :airplane: Overview
 **위 framework 를 사용하면 아래와 같은 기능들이 포함되어 활용할 수 있습니다.**
