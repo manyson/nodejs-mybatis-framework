@@ -1,10 +1,10 @@
 {
-  "name": "nodejs-mybatis",
+  "name": "nodejs-mybatis-framework",
   "version": "1.0.0",
   "description": "mybatis 를 사용한 nodejs framework",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js"
   },
   "keywords": [],
   "author": "iu00",
