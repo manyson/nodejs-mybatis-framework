@@ -7,7 +7,7 @@ Node.js 프로그램을 작성할 때 mybatis mapper 를 사용하여 효율적�
 - [Overview](#overview)
 - [Getting Started](#getting-started)
 - [Swagger](#Swagger)
-- [Software architecture](#Software architecture)
+- [Software Architecture](#Software architecture)
 - [Authors](#authors)
 - [License](#license) 
 
